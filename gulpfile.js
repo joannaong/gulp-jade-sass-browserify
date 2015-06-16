@@ -1,5 +1,5 @@
 /*
- * Project
+ * Website Name
  * 
  * @description     Gulp file for minification and deployment
  * @file            gulpfile.js
@@ -42,12 +42,12 @@ var path = {
   },
   styl: {
     dest: "/css/",
-    controller: "./src/styl/main.styl",
-    watch: ['./src/styl/*.styl']
+    main: './src/styl/app.styl',
+    watch: ['./src/styl/**/*.styl']
   },
   js: {
     dest: "/js/",
-    controller: "./src/js/Controller.js",
+    main: "./src/js/App.js",
     watch: ['./src/js/*.js', './src/asset/*.json'],
     lib: {
       src: ["src/js/lib/*.js"],
@@ -57,12 +57,7 @@ var path = {
   jade: {
     src: ["src/jade/*.jade", "!src/jade/template.jade"],
     dest: "",
-    watch: ['./src/jade/*.jade']
-  },
-  tinypng: {
-    src: ['./src/asset/*.png'],
-    dest: './src/asset/',
-    key: 'W7NHTatmADKsasAP-Pfr32p1426-hoT5'
+    watch: ['./src/jade/**/*.jade']
   }
 }
 
@@ -155,7 +150,7 @@ gulp.task('compileStylus', function() {
 
 gulp.task('compileJSBrowserify', function() {
   gutil.log("Compiling JavaScript for", gutil.colors.cyan(config[args.env].dest), "environment.");
-  gulp.src(path.js.controller, {read: false})
+  gulp.src(path.js.main, {read: false})
       .pipe(browserify({
         insertGlobals: true,
         debug: true

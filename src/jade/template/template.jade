@@ -2,17 +2,22 @@ doctype html
 | <!--[if lte IE 9]> <html lang="en" class="ieold ie "> <![endif]-->
 html(lang="en")
 	head
+		block setup
+
 		//- mixin list
-		include jade/scripts.jade
-		include jade/meta.jade
+		include ../mixins/scripts
+		include ../mixins/meta
 
 		//- [mixin] meta tags
 		+meta
 
 		//- css
 		link(rel="stylesheet", href="css/app.css", type="text/css")
-		
+
 	body
+		block content
+
 		//- js scripts
+		script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js")
 		script(src="js/lib.min.js")
 		script(src="js/app.js")

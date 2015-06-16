@@ -1,7 +1,5 @@
 // internal requires
-window.util = util = require('./Util.js');
-var dataLoader = require('./DataLoader.js');
-
+var util = require('./Util.js');
 
 var init = function() {
   console.log("init");
