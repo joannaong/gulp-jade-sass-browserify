@@ -6,8 +6,9 @@
 
 ## Technology
 - Gulp
-- SASS
+- Stylus
 - Jade
+- Browserify
 
 ## Installation
 
