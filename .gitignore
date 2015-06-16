@@ -4,6 +4,7 @@
 /deploy
 /node_modules
 /log/*
+dist/
 /aws/
 .gulp
 .awspublish-boni.dev.thesecretlocation.net
