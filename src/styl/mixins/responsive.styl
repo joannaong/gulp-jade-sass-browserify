@@ -1,0 +1,144 @@
+breakpoint-one   = 1600px
+breakpoint-two   = 1024px
+breakpoint-three = 768px
+breakpoint-four  = 640px
+
+
+/**
+ * @name desktop
+ * @desc Generic desktop media query, 1024px and up (block mixin).
+ */
+
+desktop()
+  @media(min-width: breakpoint-two)
+    {block}
+
+
+/**
+ * @name desktop-large
+ * @desc Large desktop media query, 1600px and up (block mixin).
+ */
+
+desktop-large()
+  @media(min-width: breakpoint-one)
+    {block}
+
+
+/**
+ * @name desktop-small
+ * @desc Small desktop media query, between 1024px and 1599px (block mixin).
+ */
+
+desktop-small()
+  @media(min-width: breakpoint-two) and (max-width: breakpoint-one - 1)
+    {block}
+
+
+/**
+ * @name tablet
+ * @desc Generic tablet media query, between 641px and 1023px (block mixin).
+ */
+
+tablet()
+  @media(min-width: breakpoint-four + 1) and (max-width: breakpoint-two - 1)
+    {block}
+
+
+/**
+ * @name tablet-and-up
+ * @desc Tablet and larger media query, from 641px (block mixin).
+ */
+
+tablet-and-up()
+  @media(min-width: breakpoint-four + 1)
+    {block}
+
+
+/**
+ * @name tablet-and-down
+ * @desc Tablet and lower media query, from 1023px down (block mixin).
+ */
+
+tablet-and-down()
+  @media(max-width: breakpoint-two - 1)
+    {block}
+
+
+/**
+ * @name up-to-desktop
+ * @desc Mobile and tablet up to 1023px (block mixin).
+ */
+
+up-to-desktop()
+  @media(max-width: breakpoint-two - 1)
+    {block}
+
+
+/**
+ * @name tablet-landscape-and-up
+ * @desc Landscape tablet and up media query, from 769px and up (block mixin).
+ */
+
+tablet-landscape-and-up()
+  @media(min-width: breakpoint-three + 1)
+    {block}
+
+
+/**
+ * @name tablet-landscape
+ * @desc Landscape tablet media query, between 769px and 1023px (block mixin).
+ */
+
+tablet-landscape()
+  @media(min-width: breakpoint-three + 1) and (max-width: breakpoint-two - 1)
+    {block}
+
+
+/**
+ * @name tablet-portrait
+ * @desc Portrait tablet media query, between 641px and 768px (block mixin).
+ */
+
+tablet-portrait()
+  @media(min-width: breakpoint-four + 1) and (max-width: breakpoint-three)
+    {block}
+
+
+/**
+ * @name tablet-portrait-and-down
+ * @desc Portrait tablet media query, 768px and down (block mixin).
+ */
+
+tablet-portrait-and-down()
+  @media(max-width: breakpoint-three)
+    {block}
+
+
+/**
+ * @name tablet-portrait-and-up
+ * @desc Portrait tablet media query, from 768px (block mixin).
+ */
+
+tablet-portrait-and-up()
+  @media(min-width: breakpoint-three + 1)
+    {block}
+
+
+/**
+ * @name mobile
+ * @desc Generic mobile media query, up to 640px (block mixin).
+ */
+
+mobile()
+  @media(max-width: breakpoint-four)
+    {block}
+
+
+/**
+ * @name mobile-landscape
+ * @desc Generic mobile media query, up to 640px (block mixin).
+ */
+
+mobile-landscape()
+  @media(max-width: breakpoint-three) and (orientation: landscape)
+    {block}

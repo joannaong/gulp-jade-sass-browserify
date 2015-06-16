@@ -1,0 +1,18 @@
+doctype html
+| <!--[if lte IE 9]> <html lang="en" class="ieold ie "> <![endif]-->
+html(lang="en")
+	head
+		//- mixin list
+		include jade/scripts.jade
+		include jade/meta.jade
+
+		//- [mixin] meta tags
+		+meta
+
+		//- css
+		link(rel="stylesheet", href="css/app.css", type="text/css")
+		
+	body
+		//- js scripts
+		script(src="js/lib.min.js")
+		script(src="js/app.js")

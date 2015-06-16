@@ -1,0 +1,128 @@
+/**
+ * Secret Location - Blog
+ * 
+ * @namespace  css
+ * @description  Main Stylus File. Includes all other components and pages.
+ * @author  Joanna Ong
+ * 
+ */
+ 
+
+// VARIABLES
+path-img       = "../asset/img/"
+color-red = #c60000
+color-gray = #c9c9c9
+
+// STRUCTURE
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak
+  display: none !important;
+  
+*
+  box-sizing border-box
+  margin 0
+  -webkit-font-smoothing: antialiased
+  
+html, body
+  width 100%
+  height 100%
+
+html, body, h1, h2, h3, h4, h5, h6, p, ul, li
+  margin 0
+  padding 0
+  
+a
+  text-decoration none
+  outline 0
+
+img
+  border 0
+  width 100%
+
+
+////// BASE
+body
+  background black
+  font-family "Helvetica"
+
+button
+  border none
+  margin 0
+  padding 0
+  outline 0
+  cursor pointer
+  
+.wrapper
+  max-width 1004px
+  padding 0 20px
+  width 100%
+  margin 0 auto
+  position relative
+
+
+///// mIxins
+cta__button()
+  display inline-block
+  padding 10px
+  color white
+  font-size 13px
+  font-family "Helvetica"
+  background black
+
+clearfix()
+  overflow hidden
+  
+////// HEADER
+.header
+  &__bg
+    width 100%
+    height 240px
+    background url(path-img+"hero.jpg") no-repeat center center
+    background-size cover
+  &__cta
+    position absolute
+    top 0
+    left 0
+    color white
+    &__logo
+      cta__button()
+      background color-red
+    &__login, &__signup
+      cta__button()
+
+////// NAV
+.nav
+  color white
+  border-bottom 1px solid color-red
+  border-top 1px solid color-gray
+  .wrapper
+    clearfix()
+  &--left
+    float left
+    &__sortby
+      display inline-block
+      label
+        margin-right 10px
+    &__upload, &__explore
+      cta__button()
+  &--right
+    float right
+
+
+//// CONTENT
+.view
+  background white
+  padding 20px
+  
+.box-container
+  display flex
+  justify-content space-between
+  flex-direction row
+  flex-wrap wrap
+  
+.box
+  width 23%
+  align-items center
+  border 1px solid black
+  border-radius 5px
+  padding 10px
+  margin 10px 0

@@ -1,22 +1,38 @@
-var fs = require("fs");
-var gulp = require('gulp');
-var jade = require('gulp-jade');
-var clean = require('gulp-clean');
-var browserify = require('gulp-browserify');
-var uglify = require('gulp-uglify');
-var concat = require('gulp-concat');
-var connect = require('gulp-connect');
-var gutil = require('gulp-util');
-var sass = require('gulp-ruby-sass');
-var runSequence = require('run-sequence');
-var open = require('gulp-open');
-var watch = require('gulp-watch');
-var tinypng = require('gulp-tinypng');
-var awspublish = require('gulp-awspublish');
-var config = JSON.parse(fs.readFileSync('./gulpconfig.json'));
-var s3 = require('gulp-s3');
-var args = require('yargs').argv;
-var awspublish = require('gulp-awspublish');
+/*
+ * Project
+ * 
+ * @description     Gulp file for minification and deployment
+ * @file            gulpfile.js
+ * @author          Joanna Ong
+ * @required        gulpconfig.json
+ * 
+ * @usage
+ *  -- local development
+ *    ``` gulp ```
+ *
+ *  -- build to env
+ *     @params dev, stage, prod
+ *    ``` gulp build --env dev ```
+ *
+ */
+
+var gulp        = require('gulp'),
+    args        = require('yargs').argv,
+    jade        = require('gulp-jade'),
+    styl        = require('gulp-stylus'),
+    gutil       = require('gulp-util'),
+    watch       = require('gulp-watch'),
+    concat      = require('gulp-concat'),
+    uglify      = require('gulp-uglify'),
+    runSequence = require('run-sequence'),
+    sourcemaps  = require('gulp-sourcemaps'),
+    browserSync = require('browser-sync'),
+    del         = require('del'),
+    reload      = browserSync.reload,
+    jsdoc       = require("gulp-jsdoc"),
+    ngAnnotate  = require('gulp-ng-annotate'),
+    autoprefixer = require('gulp-autoprefixer')
+    browserify = require('gulp-browserify');
 
 // paths
 var path = {
@@ -24,10 +40,10 @@ var path = {
     dest: "/asset/",
     src: ["./src/asset/**"]
   },
-  sass: {
+  styl: {
     dest: "/css/",
-    controller: "./src/sass/main.sass",
-    watch: ['./src/sass/*.sass']
+    controller: "./src/styl/main.styl",
+    watch: ['./src/styl/*.styl']
   },
   js: {
     dest: "/js/",
@@ -50,47 +66,94 @@ var path = {
   }
 }
 
-// default args
+var config = {
+  "local": {
+    "dest": "dist/local/",
+    "env": {
+      "host": "http://localhost:3000/",
+      "api": "",
+      "GA": ""
+    }
+  },
+  "dev": {
+    "dest": "dist/dev/",
+    "env": {
+      "host": "",
+      "api": "",
+      "GA": ""
+    }
+  },
+  "test": {
+    "dest": "dist/test/",
+    "env": {
+      "host": "",
+      "api": "",
+      "GA": ""
+    }
+  },
+  "prod": {
+    "dest": "dist/prod/",
+    "env": {
+      "host": "",
+      "api": "",
+      "GA": ""
+    }
+  }
+}
+
+// default args, use local if no environment is speified
 args.env = args.env ? args.env : 'local';
 
-// functions
-var copyFiles = function() {
+// more vars
+var isDropConsole = args.env == "local" || args.env == "dev" ? false : true;
+
+// tasks
+gulp.task('copy', function() {
+  // copying over asset files
   gutil.log("Copying asset for", "'" + gutil.colors.cyan(config[args.env].dest) + "'", "environment.");
   gulp.src(path.asset.src)
-  		.pipe(gulp.dest(config[args.env].dest + path.asset.dest));
+      .pipe(gulp.dest(config[args.env].dest + path.asset.dest));
   
+  // copying over javascript library files and uglifying 
   gutil.log("Copying JavaScript libraries for", gutil.colors.cyan(config[args.env].dest), "environment.");
   gulp.src(path.js.lib.src)
-  		.pipe(uglify())
+      .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(concat(path.js.lib.name))
-  		.pipe(gulp.dest(config[args.env].dest + path.js.dest));
-};
+      .pipe(sourcemaps.write('./'))
+      .pipe(gulp.dest(config[args.env].dest + path.js.dest));
+});
 
-var compileHTML = function() {
+gulp.task("compileJade", function() {
   gutil.log("Compiling HTML for", gutil.colors.cyan(config[args.env].dest), "environment.");
   gulp.src(path.jade.src)
-    .pipe(jade({
-      locals: {
-        env: config[args.env]
-      }
-    }))
-    .on('error', gutil.log)
-    .on('error', gutil.beep)
-    .pipe(gulp.dest(config[args.env].dest));
-};
-
-var compileCSS = function() {
-  gutil.log("Compiling CSS for", gutil.colors.cyan(config[args.env].dest), "environment. On ");
-  gulp.src(path.sass.controller)
-  		.pipe(sass({
-        container:'gulp-sass-'
+      .pipe(jade({
+        locals: {
+          env: config[args.env].env
+        }
       }))
-  		.on('error', gutil.log)
-  		.on('error', gutil.beep)
-  		.pipe(gulp.dest(config[args.env].dest + path.sass.dest));
-};
+      .on('error', gutil.log)
+      .on('error', gutil.beep)
+      .pipe(gulp.dest(config[args.env].dest))
+      .pipe(reload({stream:true}));
+});
 
-var compileJSBrowserify = function() {
+gulp.task('compileStylus', function() {
+  gutil.log("Compiling CSS for", gutil.colors.cyan(config[args.env].dest), "environment. On ");
+  gulp.src(path.styl.main)
+      .pipe(styl({
+        container:'gulp-styl-'
+      }))
+      .pipe(autoprefixer({
+          browsers: ['last 2 versions'],
+          cascade: false
+      }))
+      .on('error', gutil.log)
+      .on('error', gutil.beep)
+      .pipe(gulp.dest(config[args.env].dest + path.styl.dest))
+      .pipe(reload({stream:true}));
+});
+
+gulp.task('compileJSBrowserify', function() {
   gutil.log("Compiling JavaScript for", gutil.colors.cyan(config[args.env].dest), "environment.");
   gulp.src(path.js.controller, {read: false})
       .pipe(browserify({
@@ -100,78 +163,39 @@ var compileJSBrowserify = function() {
       .on('error', gutil.log)
       .on('error', gutil.beep)
       .pipe(gulp.dest(config[args.env].dest + path.js.dest));
-};
-
-var watchMe = function() {
-	watch(path.jade.watch, function(file) {
-    compileHTML();
-    copyFiles();
-  });
-  watch(path.sass.watch, function(file) {
-    compileCSS();
-    copyFiles();
-  });
-  watch(path.js.watch, function(file) {
-    compileJSBrowserify();
-    copyFiles();
-  });
-}
-
-// tiny png
-gulp.task('tinypng', function () {
-  gulp.src(path.tinypng.src)
-      .pipe(tinypng(path.tinypng.key))
-      .pipe(gulp.dest(path.tinypng.dest));
 });
 
-/*
- * 
- * LOCAL DEV
- * start developing by typing in ``` gulp ``` in your terminal
- *
- */ 
-gulp.task('connect', function() {
-  connect.server({
-    root: 'deploy/local/',
-    livereload: true,
-    port: 9000
+gulp.task('browser-sync', function() {
+  browserSync({
+    server: {
+      baseDir: config['local'].dest
+    }
   });
-  gulp.watch('deploy/local' + '**').on('change', function(file) {
-    connect.reload();
-  });
-  var options = {
-    url: "http://localhost:9000",
-    app: "google-chrome"
-  };
-  gulp.src("deploy/local/index.html")
-      .pipe(open("", options));
 });
-gulp.task('local', function() {
-  compileHTML();
-  compileCSS();
-  compileJSBrowserify();
-  copyFiles();
-  watchMe();
+
+gulp.task('clean', function(cb) {
+  del([config[args.env].dest+"/**"], cb);
 });
+
+gulp.task('watch',function(){
+  gulp.watch(path.jade.watch, ['compileJade']);
+  gulp.watch(path.styl.watch, ['compileStylus']);
+  gulp.watch(path.js.watch, ['compileJSBrowserify']);
+  gulp.watch(path.asset.watch, ['copy']);
+});
+
+// LOCAL DEV
 gulp.task('default', function() {
-  runSequence('connect', 'local');
+  runSequence("build", "browser-sync", "watch");
 });
 
-/*
- * 
- * BUILD TO ENV
- * --env params: dev, stage, prod
- *
- * ``` gulp build --env dev ```
- *
- */ 
+// BUILD TO ENV
 gulp.task('build', function(){
-  compileHTML(config[args.env]);
-  compileCSS(config[args.env]);
-  compileJSBrowserify(config[args.env]);
-  copyFiles(config[args.env]);
-});
-gulp.task('deploy', function(){
-  return gulp.src(config[args.env].deployFolder)
-             .pipe(s3(config[args.env].aws, { read: false }));
+  runSequence(
+    'clean',
+    'copy',
+    'compileJade',
+    'compileStylus',
+    'compileJSBrowserify'
+  );
 });
