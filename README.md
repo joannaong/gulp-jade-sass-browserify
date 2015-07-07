@@ -38,3 +38,4 @@ gulp deploy --env stage
 
 ## Contributors
 Joanna Ong
+Michael Phan

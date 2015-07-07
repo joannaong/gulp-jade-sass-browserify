@@ -126,8 +126,10 @@ gulp.task("compileJade", function() {
           env: config[args.env].env
         }
       }))
+      .on('error', function () {
+        gutil.beep()
+      })
       .on('error', gutil.log)
-      .on('error', gutil.beep)
       .pipe(gulp.dest(config[args.env].dest))
       .pipe(reload({stream:true}));
 });
@@ -142,8 +144,10 @@ gulp.task('compileStylus', function() {
           browsers: ['last 2 versions'],
           cascade: false
       }))
+      .on('error', function () {
+        gutil.beep()
+      })
       .on('error', gutil.log)
-      .on('error', gutil.beep)
       .pipe(gulp.dest(config[args.env].dest + path.styl.dest))
       .pipe(reload({stream:true}));
 });
@@ -155,8 +159,10 @@ gulp.task('compileJSBrowserify', function() {
         insertGlobals: true,
         debug: true
       }))
+      .on('error', function () {
+        gutil.beep()
+      })
       .on('error', gutil.log)
-      .on('error', gutil.beep)
       .pipe(gulp.dest(config[args.env].dest + path.js.dest));
 });
 
