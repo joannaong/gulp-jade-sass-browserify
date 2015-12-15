@@ -1,11 +1,11 @@
 /*
  * Website Name
- * 
+ *
  * @description     Gulp file for minification and deployment
  * @file            gulpfile.js
  * @author          Joanna Ong
  * @required        gulpconfig.json
- * 
+ *
  * @usage
  *  -- local development
  *    ``` gulp ```
@@ -29,7 +29,6 @@ var gulp        = require('gulp'),
     browserSync = require('browser-sync'),
     del         = require('del'),
     reload      = browserSync.reload,
-    jsdoc       = require("gulp-jsdoc"),
     ngAnnotate  = require('gulp-ng-annotate'),
     autoprefixer = require('gulp-autoprefixer')
     browserify = require('gulp-browserify');
@@ -108,8 +107,8 @@ gulp.task('copy', function() {
   gutil.log("Copying asset for", "'" + gutil.colors.cyan(config[args.env].dest) + "'", "environment.");
   gulp.src(path.asset.src)
       .pipe(gulp.dest(config[args.env].dest + path.asset.dest));
-  
-  // copying over javascript library files and uglifying 
+
+  // copying over javascript library files and uglifying
   gutil.log("Copying JavaScript libraries for", gutil.colors.cyan(config[args.env].dest), "environment.");
   gulp.src(path.js.lib.src)
       .pipe(sourcemaps.init({loadMaps: true}))
