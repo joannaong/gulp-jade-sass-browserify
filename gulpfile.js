@@ -3,7 +3,6 @@
  *
  * @description     Gulp file for minification and deployment
  * @file            gulpfile.js
- * @author          Joanna Ong
  * @required        gulpconfig.json
  *
  * @usage
@@ -46,7 +45,7 @@ var path = {
   },
   js: {
     dest: "/js/",
-    main: "./src/js/App.js",
+    main: "./src/js/app.js",
     watch: ['./src/js/*.js', './src/asset/*.json'],
     lib: {
       src: ["src/js/lib/*.js"],

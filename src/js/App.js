@@ -1,5 +1,5 @@
 // internal requires
-var util = require('./Util.js');
+var util = require('./util.js');
 
 var init = function() {
   console.log("init");
