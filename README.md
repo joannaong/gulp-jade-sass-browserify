@@ -34,8 +34,3 @@ Stage Deployment
 ```
 gulp deploy --env stage
 ```
-
-
-## Contributors
-Joanna Ong
-Michael Phan
