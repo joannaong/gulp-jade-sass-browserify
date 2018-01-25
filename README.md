@@ -22,15 +22,7 @@ npm install
 gulp
 ```
 
-## Deployment
-Dev Deployment
-
+## Environment Build
 ```
-gulp deploy --env dev
-```
-
-Stage Deployment
-
-```
-gulp deploy --env stage
+gulp build --env <env>
 ```

@@ -151,12 +151,6 @@ gulp.task('compileJS', function() {
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(config[args.env].dest + path.js.dest))
         .pipe(browserSync.reload({stream: true}));
-  // gulp.src(path.js.main)
-  //     .on('error', function () {
-  //       gutil.beep()
-  //     })
-  //     .on('error', gutil.log)
-  //     .pipe(gulp.dest(config[args.env].dest + path.js.dest));
 });
 
 gulp.task('browser-sync', function() {
