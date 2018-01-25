@@ -31,7 +31,9 @@ var gulp        = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
-    buffer = require('vinyl-buffer');
+    buffer = require('vinyl-buffer'),
+    fs = require('fs'),
+    templateData = JSON.parse(fs.readFileSync('./src/data/data.json'));
 
 // paths
 var path = {
@@ -64,25 +66,19 @@ var config = {
   "local": {
     "dest": "dist/local",
     "env": {
-      "host": "http://localhost:3000/",
-      "api": "",
-      "GA": ""
+      "host": "http://localhost:3000/"
     }
   },
   "dev": {
     "dest": "dist/dev",
     "env": {
-      "host": "",
-      "api": "",
-      "GA": ""
+      "host": ""
     }
   },
   "prod": {
     "dest": "dist/prod",
     "env": {
-      "host": "",
-      "api": "",
-      "GA": ""
+      "host": ""
     }
   }
 }
@@ -114,7 +110,8 @@ gulp.task('compileJade', function() {
   gulp.src(path.jade.src)
       .pipe(jade({
         locals: {
-          env: config[args.env].env
+          env: config[args.env].env,
+          data: templateData
         }
       }))
       .on('error', function () {
