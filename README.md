@@ -8,7 +8,7 @@
 - Gulp
 - Stylus
 - Jade
-- Browserify
+- ES6 (browserify + babel)
 
 ## Installation
 
