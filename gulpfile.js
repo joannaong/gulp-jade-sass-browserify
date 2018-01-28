@@ -33,84 +33,67 @@ var gulp        = require('gulp'),
     source = require('vinyl-source-stream'),
     buffer = require('vinyl-buffer'),
     fs = require('fs'),
-    templateData = JSON.parse(fs.readFileSync('./src/data/data.json'));
+    templateData = JSON.parse(fs.readFileSync('./src/data/data.json')),
+    ftp = require('gulp-ftp');
 
 // paths
 var path = {
   asset: {
-    dest: "/asset/",
-    src: ["./src/asset/**"]
+    dest: '/asset/',
+    src: ['./src/asset/**']
   },
   styl: {
-    dest: "/css/",
+    dest: '/css/',
     main: './src/styl/app.styl',
     watch: ['./src/styl/**/*.styl']
   },
   js: {
-    dest: "/js/",
-    main: "./src/js/App.js",
+    dest: '/js/',
+    main: './src/js/App.js',
     watch: ['./src/js/*.js', './src/asset/*.json'],
     lib: {
-      src: ["src/js/lib/*.js"],
-      name: "lib.min.js"
+      src: ['src/js/lib/*.js'],
+      name: 'lib.min.js'
     }
   },
   jade: {
-    src: ["src/jade/*.jade", "!src/jade/template.jade"],
-    dest: "",
-    watch: ['./src/jade/**/*.jade']
+    src: ['src/jade/*.jade', '!src/jade/template.jade'],
+    dest: '',
+    watch: ['./src/jade/**/*.jade', 'src/data/*.json']
   }
 }
 
 var config = {
-  "local": {
-    "dest": "dist/local",
-    "env": {
-      "host": "http://localhost:3000/"
-    }
-  },
-  "dev": {
-    "dest": "dist/dev",
-    "env": {
-      "host": ""
-    }
-  },
-  "prod": {
-    "dest": "dist/prod",
-    "env": {
-      "host": ""
-    }
+  dest: "dist",
+  ftp: {
+    host: "",
+    remotePath: "",
+    user: "",
+    pass: "",
   }
 }
-
-// default args, use local if no environment is speified
-args.env = args.env ? args.env : 'local';
-
-// more vars
-var isDropConsole = args.env == 'local' || args.env == 'dev' ? false : true;
 
 // tasks
 gulp.task('copy', function() {
   // copying over asset files
-  gutil.log('Copying asset for', gutil.colors.cyan(config[args.env].dest), "environment.");
+  gutil.log('Copying asset for', gutil.colors.cyan(config.dest), "environment.");
   gulp.src(path.asset.src)
-      .pipe(gulp.dest(config[args.env].dest + path.asset.dest));
+      .pipe(gulp.dest(config.dest + path.asset.dest));
 
   // copying over javascript library files and uglifying
-  gutil.log('Copying JavaScript libraries for', gutil.colors.cyan(config[args.env].dest), 'environment.');
+  gutil.log('Copying JavaScript libraries for', gutil.colors.cyan(config.dest), 'environment.');
   gulp.src(path.js.lib.src)
       .pipe(sourcemaps.init({loadMaps: true}))
       .pipe(concat(path.js.lib.name))
       .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest(config[args.env].dest + path.js.dest));
+      .pipe(gulp.dest(config.dest + path.js.dest));
 });
 
 gulp.task('compileJade', function() {
-  gutil.log('Compiling HTML for', gutil.colors.cyan(config[args.env].dest), 'environment.');
+  gutil.log('Compiling HTML for', gutil.colors.cyan(config.dest), 'environment.');
   gulp.src(path.jade.src)
       .pipe(jade({
         locals: {
-          env: config[args.env].env,
           data: templateData
         }
       }))
@@ -118,12 +101,12 @@ gulp.task('compileJade', function() {
         gutil.beep()
       })
       .on('error', gutil.log)
-      .pipe(gulp.dest(config[args.env].dest))
+      .pipe(gulp.dest(config.dest))
       .pipe(reload({stream:true}));
 });
 
 gulp.task('compileStylus', function() {
-  gutil.log('Compiling CSS for', gutil.colors.cyan(config[args.env].dest), 'environment. On ');
+  gutil.log('Compiling CSS for', gutil.colors.cyan(config.dest), 'environment');
   gulp.src(path.styl.main)
       .pipe(styl({
         container:'gulp-styl-'
@@ -136,12 +119,12 @@ gulp.task('compileStylus', function() {
         gutil.beep()
       })
       .on('error', gutil.log)
-      .pipe(gulp.dest(config[args.env].dest + path.styl.dest))
+      .pipe(gulp.dest(config.dest + path.styl.dest))
       .pipe(reload({stream:true}));
 });
 
 gulp.task('compileJS', function() {
-  gutil.log('Compiling JavaScript for', gutil.colors.cyan(config[args.env].dest + path.js.dest), 'environment.');
+  gutil.log('Compiling JavaScript for', gutil.colors.cyan(config.dest + path.js.dest), 'environment.');
   return browserify(path.js.main, {debug: true, extensions: ['es6']})
         .transform('babelify', {presets: ['es2015']})
         .bundle()
@@ -149,20 +132,25 @@ gulp.task('compileJS', function() {
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest(config[args.env].dest + path.js.dest))
+        .pipe(gulp.dest(config.dest + path.js.dest))
         .pipe(browserSync.reload({stream: true}));
 });
 
 gulp.task('browser-sync', function() {
   browserSync({
     server: {
-      baseDir: config['local'].dest
+      baseDir: config.dest
     }
   });
 });
 
 gulp.task('clean', function(cb) {
-  del([config[args.env].dest+'/**'], cb);
+  del([config.dest+'/**'], cb);
+});
+
+gulp.task('ftp', function () {
+  gulp.src('dist/**')
+    .pipe(ftp(config.ftp))
 });
 
 gulp.task('watch',function(){
@@ -185,5 +173,17 @@ gulp.task('build', function(){
     'compileJade',
     'compileStylus',
     'compileJS'
+  );
+});
+
+// deploy
+gulp.task('deploy', function (callback) {
+  runSequence(
+      'clean',
+      'copy',
+      'compileJade',
+      'compileStylus',
+      'compileJS',
+      'ftp'
   );
 });
